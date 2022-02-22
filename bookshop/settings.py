@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    "rest_framework.authtoken",
     'book',
     'django_extensions',
     'accounts',
@@ -49,7 +51,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -79,13 +81,23 @@ WSGI_APPLICATION = 'bookshop.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'mydb',
+        'USER': 'michal',
+        'PASSWORD': '12345',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -104,6 +116,28 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# REST_FRAMEWORK = {
+#     'USER_DETAILS_SERIALIZER': 'accounts.serializer.UserSerializer'
+# }
+
+REST_FRAMEWORK = {
+    # 'DEFAULT_AUTHENTICATION_CLASSES': [
+    #     'rest_framework.authentication.TokenAuthentication',
+    # ],
+    # 'DEFAULT_FILTER_BACKENDS': [
+    #     'django_filters.rest_framework.DjangoFilterBackend'
+    # ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication'
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'USER_DETAILS_SERIALIZER': 'accounts.serializer.UserSerializer',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 5
+}
 
 
 # Internationalization
@@ -127,3 +161,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SIMPLE_JWT = {
+    "AUTH_HEADER_TYPES": ("Bearer", ),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=3),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=15),
+    # 'ROTATE_REFRESH_TOKENS': True,
+}

@@ -1,4 +1,5 @@
 from django.db import models
+from accounts.models import User
 
 
 class PublishingHouse(models.Model):
@@ -94,6 +95,9 @@ class Book(models.Model):
 	def get_library_name(self):
 		return self.library.get_library_name()
 
+	def get_user_details(self):
+		return self.user.get_details()
+		
 	def get_books(self):
 		return {			
 			"status": self.is_borrowed_info(),

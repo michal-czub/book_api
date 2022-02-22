@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager)
+from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager, PermissionsMixin)
 
 class UserManager(BaseUserManager):
 	def create_user(self, email, name, age, birthdate, password=None, is_active=True, is_staff=False, is_admin=False):
@@ -21,27 +21,27 @@ class UserManager(BaseUserManager):
 		return user
 
 	def create_staffuser(self, email, name, age, birthdate, password=None):
-		user = self.create_user(
+		return self.create_user(
 			email,
 			password=password,
+			is_active=True,
 			is_staff=True,
 			name=name,
 			age=age,
 			birthdate=birthdate
-		)
-		return user
+		)		
 
 	def create_superuser(self, email, name, age, birthdate, password=None):
-		user = self.create_user(
+		return self.create_user(
 			email,
 			password=password,
+			is_active=True,
 			is_staff=True,
 			is_admin=True,
 			name=name,
 			age=age,
 			birthdate=birthdate
-		)
-		return user
+		)		
 
 class User(AbstractBaseUser):
 	email = models.EmailField(max_length=255, unique=True)
@@ -76,6 +76,23 @@ class User(AbstractBaseUser):
 	def has_module_perms(self, app_label):
 		return self.admin
 
+	def get_status(self):
+		if self.admin==True:
+			return "User - Admin"
+		elif self.staff==True:
+			return "User - Employee"
+		elif self.active==True:
+			return "User - Active user"
+
+	def get_details(self):
+		return {
+			"email": self.email,
+			"name": self.name,
+			"age": self.age,
+			"birthdate": self.birthdate,
+			"status": self.get_status()			
+		}
+
 	@property
 	def is_active(self):
 		return self.active
@@ -87,9 +104,6 @@ class User(AbstractBaseUser):
 	@property
 	def is_admin(self):
 		return self.admin
-	 
-	
-	
-	
 
-
+	class Meta:
+		ordering = ['id']
